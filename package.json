@@ -1,0 +1,14 @@
+{
+  "name": "beams-web-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jonathan Lloyd <jonathan@thisisjonathan.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@pusher/push-notifications-server": "^1.2.0",
+    "express": "^4.17.1"
+  }
+}
