@@ -13,5 +13,6 @@ An example client can be found in `public/index.html`
 4. Visit `http://localhost:3000` *in Google Chrome* and accept the notification permissions prompt
 5. Visit `http://localhost:3000/publish` in another tab
 6. Get a push notification!
+7. Remove the notification permission to prevent getting notified in future!
 
 **Warning: Running this example will authenticate your browser as "alice" with a default Beams instance. Either use your own credentials in `server.js` or remember to remove the notification permission when you're done. Otherwise you may get mysterious notifications from strangers!**
