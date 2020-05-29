@@ -9,17 +9,62 @@
   <body>
     <script src="https://unpkg.com/@pusher/push-notifications-web@0.9.2/dist/push-notifications-cdn.js"></script>
     <script>
-      let tokenProvider = new PusherPushNotifications.TokenProvider({
-        url: 'http://localhost:3000/pusher/beams-auth',
-      });
 
-      let beamsClient;
+      function configureNotificationButtons(){
+        if(Notification.permission === 'denied'){
+          // Display a message saying you need to unblock to display notifications
+          document.getElementById("disabled").style.display = "block"
+        } else if(Notification.permission !== 'granted' || !beamsClient.userId){
+          // Show "enable notifications" button
+          // When the user clicks the button, call enableNotifications()
+          document.getElementById("register").style.display = "block"
+          document.getElementById("registered").style.display = "none"
+        } else {
+          // Notifications are enabled
+          // Show "disable notifications" button
+          document.getElementById("register").style.display = "none"
+          document.getElementById("registered").style.display = "block"
+        }
+      }
+
+      var currentUserId = 'alice' // Get this from your auth system
+      var beamsClient;
       PusherPushNotifications.init({
-        instanceId: 'beb6f539-ed11-4a61-a2ea-845292c64db1',
+          instanceId: 'beb6f539-ed11-4a61-a2ea-845292c64db1',
       })
-        .then(beamsClient => beamsClient.start())
-        .then(beamsClient => beamsClient.setUserId('alice', tokenProvider))
-        .catch(console.error);
+      .then(bc => {
+          // Make Beams client available globally
+          beamsClient = bc;
+      })
+      .then(()=>{
+          // If the user is no longer logged in but didn't explicitly log out e.g. session expired
+          if (beamsClient.userId !== currentUserId || Notification.permission !== 'granted') {
+              // Unregister for notifications
+              return beamsClient.stop();
+          }
+      })
+      .then(configureNotificationButtons)
+
+      function enableNotifications(){
+        let beamsTokenProvider = new PusherPushNotifications.TokenProvider({
+          url: 'http://localhost:3000/pusher/beams-auth',
+        });
+        // This will show the dialog requesting permissions and associate the user with this device
+        beamsClient
+          .start()
+          .then(() => beamsClient.setUserId(currentUserId, beamsTokenProvider))
+          .then(configureNotificationButtons)
+      }
+
+      function disableNotifications(){
+        beamsClient
+          .stop()
+          .then(configureNotificationButtons)
+      }
+
     </script>
+    <button id="register" onclick="enableNotifications()" style="display:none">Enable notifications</button>
+    <button id="registered" onclick="disableNotifications()" style="display:none">Disable notifications</button>
+    <div id="disabled" style="display:none">You must give permissions to display notifications</div>
   </body>
 </html>
