@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/@pusher/push-notifications-web@0.9.2/dist/push-notifications-cdn.js"></script>
     <script>
 
-      function configureNotificationButtons(){
+      function onNotificationStateChange(){
         if(Notification.permission === 'denied'){
           // Display a message saying you need to unblock to display notifications
           document.getElementById("disabled").style.display = "block"
@@ -43,7 +43,8 @@
               return beamsClient.stop();
           }
       })
-      .then(configureNotificationButtons)
+      .then(onNotificationStateChange)
+      .catch(console.error)
 
       function enableNotifications(){
         let beamsTokenProvider = new PusherPushNotifications.TokenProvider({
@@ -53,18 +54,20 @@
         beamsClient
           .start()
           .then(() => beamsClient.setUserId(currentUserId, beamsTokenProvider))
-          .then(configureNotificationButtons)
+          .then(onNotificationStateChange)
+          .catch(console.error)
       }
 
       function disableNotifications(){
         beamsClient
           .stop()
-          .then(configureNotificationButtons)
+          .then(onNotificationStateChange)
+          .catch(console.error)
       }
 
     </script>
     <button id="register" onclick="enableNotifications()" style="display:none">Enable notifications</button>
     <button id="registered" onclick="disableNotifications()" style="display:none">Disable notifications</button>
-    <div id="disabled" style="display:none">You must give permissions to display notifications</div>
+    <div id="disabled" style="display:none">You must give permission to display notifications</div>
   </body>
 </html>
